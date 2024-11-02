@@ -1,0 +1,11 @@
+/.github
+/.idea
+/target
+config.json
+config.*.json
+config.yaml
+config.*.yaml
+config.yml
+config.*.yml
+**/*.rs.bk
+*.pdb
