@@ -26,12 +26,12 @@ jobs:
 
     - run: echo "# ${{ steps.release.outputs.version}}" >> $GITHUB_STEP_SUMMARY
 
-    - run: cat release-notes.md >> $GITHUB_STEP_SUMMARY
+    - run: cat /tmp/RELEASE-NOTES.md >> $GITHUB_STEP_SUMMARY
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-notes.md
-        path: release-notes.md
+        name: RELEASE-NOTES.md
+        path: /tmp/RELEASE-NOTES.md
 
     - run: /home/linuxbrew/.linuxbrew/bin/brew install cargo-edit
       if: ${{ steps.release.outputs.version != ''}}
@@ -148,7 +148,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: release-notes.md
+        name: RELEASE-NOTES.md
 
     - name: gh release create
       if: ${{ ! contains(needs.release.outputs.version, '-') }}
@@ -158,7 +158,7 @@ jobs:
         gh release create
         "v${{ needs.release.outputs.version }}"
         --title "v${{ needs.release.outputs.version }}"
-        --notes-file release-notes.md
+        --notes-file RELEASE-NOTES.md
         --target ${{ github.ref_name }}
 
     - name: gh release create --prerelease
@@ -169,6 +169,6 @@ jobs:
         gh release create
         "v${{ needs.release.outputs.version }}"
         --title "v${{ needs.release.outputs.version }}"
-        --notes-file release-notes.md
+        --notes-file RELEASE-NOTES.md
         --target ${{ github.ref_name }}
         --prerelease
