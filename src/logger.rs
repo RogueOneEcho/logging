@@ -28,7 +28,7 @@ impl Logger {
     /// Force init the logger so logs aren't lost to the void prior to builder initialization.
     pub fn force_init(package_name: String) {
         let logger = Logger {
-            enabled_threshold: Trace,
+            enabled_threshold: Verbosity::Trace,
             time_format: TimeFormat::Local,
             start: SystemTime::now(),
             package_name,
@@ -90,7 +90,7 @@ impl Log for Logger {
 }
 
 fn format_message(verbosity: Verbosity, message: String) -> String {
-    if verbosity.as_num() >= Debug.as_num() {
+    if verbosity.as_num() >= Verbosity::Debug.as_num() {
         format!("{}", message.dimmed())
     } else {
         message

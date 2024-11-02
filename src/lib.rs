@@ -1,10 +1,13 @@
 pub use colors::*;
+pub use error::*;
 pub use logger::*;
 pub use time_format::*;
-pub(crate) use verbosity::Verbosity::*;
 pub use verbosity::*;
 
 mod colors;
+mod error;
+#[cfg(test)]
+mod error_tests;
 mod logger;
 #[cfg(test)]
 mod logger_tests;

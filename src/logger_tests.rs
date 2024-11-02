@@ -7,7 +7,7 @@ use std::time::SystemTime;
 fn log_time_local() {
     // Arrange
     let logger = Logger {
-        enabled_threshold: Trace,
+        enabled_threshold: Verbosity::Trace,
         time_format: TimeFormat::Local,
         start: SystemTime::now(),
         package_name: "coda".to_owned(),
@@ -26,7 +26,7 @@ fn log_time_local() {
 fn log_time_utc() {
     // Arrange
     let logger = Logger {
-        enabled_threshold: Trace,
+        enabled_threshold: Verbosity::Trace,
         time_format: TimeFormat::Utc,
         start: SystemTime::now(),
         package_name: "coda".to_owned(),
@@ -45,7 +45,7 @@ fn log_time_utc() {
 fn log_time_elapsed() {
     // Arrange
     let logger = Logger {
-        enabled_threshold: Trace,
+        enabled_threshold: Verbosity::Trace,
         time_format: TimeFormat::Elapsed,
         start: SystemTime::now(),
         package_name: "coda".to_owned(),
@@ -64,7 +64,7 @@ fn log_time_elapsed() {
 fn log_time_none() {
     // Arrange
     let logger = Logger {
-        enabled_threshold: Trace,
+        enabled_threshold: Verbosity::Trace,
         time_format: TimeFormat::None,
         start: SystemTime::now(),
         package_name: "coda".to_owned(),
