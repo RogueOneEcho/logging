@@ -1,8 +1,8 @@
-use std::sync::Arc;
 use chrono::{Local, Utc};
 use colored::control::SHOULD_COLORIZE;
 use colored::{ColoredString, Colorize};
 use log::*;
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use crate::*;
@@ -11,7 +11,7 @@ pub struct Logger {
     pub enabled_threshold: Verbosity,
     pub time_format: TimeFormat,
     pub start: SystemTime,
-    pub package_name: String
+    pub package_name: String,
 }
 
 impl Logger {
@@ -31,7 +31,7 @@ impl Logger {
             enabled_threshold: Trace,
             time_format: TimeFormat::Local,
             start: SystemTime::now(),
-            package_name
+            package_name,
         };
         Logger::init(Arc::new(logger));
     }

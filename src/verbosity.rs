@@ -70,18 +70,6 @@ impl Verbosity {
     }
 
     #[must_use]
-    pub(crate) fn to_level(self) -> Option<Level> {
-        match self {
-            Silent => None,
-            Error => Some(Level::Error),
-            Warn => Some(Level::Warn),
-            Info => Some(Level::Info),
-            Debug => Some(Level::Debug),
-            Trace => Some(Level::Trace),
-        }
-    }
-
-    #[must_use]
     pub(crate) fn to_level_filter(self) -> LevelFilter {
         match self {
             Silent => LevelFilter::Off,
