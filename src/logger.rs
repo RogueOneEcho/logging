@@ -70,7 +70,8 @@ impl Logger {
 
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        if !metadata.target().starts_with(&self.package_name) {
+        let target = metadata.target();
+        if !target.starts_with(&self.package_name) && !target.starts_with("rogue_logging") {
             return false;
         }
         self.is_enabled(Verbosity::from_level(metadata.level()))
