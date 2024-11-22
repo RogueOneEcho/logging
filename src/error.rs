@@ -629,6 +629,41 @@ where
     }
 }
 
+/// Converts a Result<Infallible, String> into a custom `Error` type.
+///
+/// This implementation allows automatic conversion from `Result<Infallible, String>`
+/// to the custom `Error` type, enabling seamless error propagation with the `?` operator
+/// when working with string-based errors.
+///
+/// # Arguments
+///
+/// * `err` - The source `Result<Infallible, String>` to be converted
+///
+/// # Returns
+///
+/// A new `Error` instance with a generic operation context and the
+/// string error message from the Result.
+///
+/// # Examples
+///
+/// ```
+/// let result: Result<Infallible, String> = Err("Operation failed".to_string());
+/// let custom_error: Error = result.into();
+/// ```
+///
+/// # Notes
+///
+/// - Enables the use of the `?` operator with string-based errors
+/// - Provides a generic "perform operation" context
+impl From<Result<Infallible, String>> for Error {
+    fn from(err: Result<Infallible, String>) -> Self {
+        match err {
+            Ok(infallible) => match infallible {},
+            Err(msg) => Error::new("perform operation".to_owned(), msg),
+        }
+    }
+}
+
 #[allow(clippy::wildcard_enum_match_arm)]
 fn get_backtrace() -> Option<Backtrace> {
     let backtrace = Backtrace::capture();

@@ -1,5 +1,6 @@
 use crate::Error;
 use chrono::DateTime;
+use std::convert::Infallible;
 use std::fmt::Write;
 use std::io;
 use std::str;
@@ -236,4 +237,43 @@ fn test_from_chrono_parse_error() {
     // Assert
     assert_eq!(error.action, "parse time");
     assert!(!error.message.is_empty());
+}
+
+#[test]
+fn test_string_error_conversion() {
+    // Test direct string conversion
+    let err_str = "test error message";
+    let error: Error = err_str.into();
+    assert_eq!(error.message, err_str);
+    assert_eq!(error.action, "perform operation");
+
+    // Test String conversion
+    let err_string = String::from("test error message");
+    let error: Error = err_string.clone().into();
+    assert_eq!(error.message, err_string);
+    assert_eq!(error.action, "perform operation");
+
+    // Test Result<Infallible, String> conversion
+    let result: Result<Infallible, String> = Err("test error message".to_string());
+    let error: Error = result.into();
+    assert_eq!(error.message, "test error message");
+    assert_eq!(error.action, "perform operation");
+}
+
+#[test]
+fn test_error_propagation() {
+    fn returns_string_error() -> Result<Infallible, String> {
+        Err("Operation failed".to_string())
+    }
+
+    // Test that the error is properly propagated
+    let result: Result<(), Error> = (|| {
+        let _result = returns_string_error()?;
+        Ok(())
+    })();
+
+    assert!(result.is_err());
+    let error = result.unwrap_err();
+    assert_eq!(error.action, "perform operation");
+    assert_eq!(error.message, "Operation failed");
 }
