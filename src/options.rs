@@ -15,8 +15,8 @@ pub struct LoggerOptions {
     pub log_time_format: Option<TimeFormat>,
 
     /// Include only logs from specific packages
-    pub log_include_filter: Option<Vec<String>>,
+    pub log_include_filters: Option<Vec<String>>,
 
     /// Exclude logs from specific packages
-    pub log_exclude_filter: Option<Vec<String>>,
+    pub log_exclude_filters: Option<Vec<String>>,
 }

@@ -51,14 +51,14 @@ impl Logger {
     }
 
     fn exclude_by_target(&self, target: &str) -> bool {
-        if let Some(exclude_filters) = self.options.log_exclude_filter.clone() {
+        if let Some(exclude_filters) = self.options.log_exclude_filters.clone() {
             for filter in exclude_filters {
                 if target.starts_with(&filter) {
                     return true;
                 }
             }
         }
-        if let Some(mut include_filters) = self.options.log_include_filter.clone() {
+        if let Some(mut include_filters) = self.options.log_include_filters.clone() {
             include_filters.push(PACKAGE_NAME.to_owned());
             for filter in include_filters {
                 if !target.starts_with(&filter) {

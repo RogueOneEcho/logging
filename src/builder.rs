@@ -38,17 +38,17 @@ impl LoggerBuilder {
 
     #[must_use]
     pub fn with_include_filter(mut self, include_filter: String) -> Self {
-        let mut filters = self.options.log_include_filter.unwrap_or_default();
+        let mut filters = self.options.log_include_filters.unwrap_or_default();
         filters.push(include_filter);
-        self.options.log_include_filter = Some(filters);
+        self.options.log_include_filters = Some(filters);
         self
     }
 
     #[must_use]
     pub fn with_exclude_filter(mut self, exclude_filter: String) -> Self {
-        let mut filters = self.options.log_exclude_filter.unwrap_or_default();
+        let mut filters = self.options.log_exclude_filters.unwrap_or_default();
         filters.push(exclude_filter);
-        self.options.log_exclude_filter = Some(filters);
+        self.options.log_exclude_filters = Some(filters);
         self
     }
 
