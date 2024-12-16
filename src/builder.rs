@@ -45,6 +45,14 @@ impl LoggerBuilder {
     }
 
     #[must_use]
+    pub fn with_exclude_filter(mut self, exclude_filter: String) -> Self {
+        let mut filters = self.options.log_exclude_filter.unwrap_or_default();
+        filters.push(exclude_filter);
+        self.options.log_exclude_filter = Some(filters);
+        self
+    }
+
+    #[must_use]
     pub fn with_init(mut self) -> Self {
         self.init = true;
         self

@@ -16,4 +16,7 @@ pub struct LoggerOptions {
 
     /// Include only logs from specific packages
     pub log_include_filter: Option<Vec<String>>,
+
+    /// Exclude logs from specific packages
+    pub log_exclude_filter: Option<Vec<String>>,
 }

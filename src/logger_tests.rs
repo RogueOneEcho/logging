@@ -56,3 +56,15 @@ fn logger_with_time_format_none() {
     // Act
     example_logs();
 }
+
+#[test]
+#[ignore]
+fn logger_with_exclude_filter() {
+    // Arrange
+    let _logger = LoggerBuilder::new()
+        .with_exclude_filter("rogue_logging".to_owned())
+        .create();
+
+    // Act
+    example_logs();
+}
