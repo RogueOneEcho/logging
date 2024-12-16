@@ -1,41 +1,28 @@
 use chrono::{Local, Utc};
-use colored::control::SHOULD_COLORIZE;
 use colored::{ColoredString, Colorize};
 use log::*;
-use std::sync::Arc;
+use std::borrow::ToOwned;
 use std::time::SystemTime;
 
 use crate::*;
 
+const PACKAGE_NAME: &str = "rogue_logging";
+
 pub struct Logger {
-    pub enabled_threshold: Verbosity,
-    pub time_format: TimeFormat,
-    pub start: SystemTime,
-    pub package_name: String,
+    pub(crate) options: LoggerOptions,
+    start: SystemTime,
+}
+
+impl From<LoggerOptions> for Logger {
+    fn from(options: LoggerOptions) -> Self {
+        Self {
+            options,
+            start: SystemTime::now(),
+        }
+    }
 }
 
 impl Logger {
-    //noinspection RsExperimentalTraitObligations
-    pub fn init(logger: Arc<Self>) {
-        SHOULD_COLORIZE.set_override(true);
-        let filter = logger.enabled_threshold.to_level_filter();
-        let logger = Box::new(logger);
-        if let Err(error) = set_boxed_logger(logger).map(|()| set_max_level(filter)) {
-            trace!("{} to initialize the logger: {}", "Failed".bold(), error);
-        }
-    }
-
-    /// Force init the logger so logs aren't lost to the void prior to builder initialization.
-    pub fn force_init(package_name: String) {
-        let logger = Logger {
-            enabled_threshold: Verbosity::Trace,
-            time_format: TimeFormat::Local,
-            start: SystemTime::now(),
-            package_name,
-        };
-        Logger::init(Arc::new(logger));
-    }
-
     fn format_log(&self, verbosity: Verbosity, message: String) -> String {
         let prefix = self.format_prefix(verbosity);
         let message = format_message(verbosity, message);
@@ -51,7 +38,7 @@ impl Logger {
     }
 
     fn format_time(&self) -> ColoredString {
-        let value = match self.time_format {
+        let value = match self.options.log_time_format.unwrap_or_default() {
             TimeFormat::Local => Local::now().format("%Y-%m-%d %H:%M:%S%.3f ").to_string(),
             TimeFormat::Utc => Utc::now().format("%Y-%m-%d %H:%M:%S%.3fZ ").to_string(),
             TimeFormat::Elapsed => format!(
@@ -63,18 +50,28 @@ impl Logger {
         value.dark_gray()
     }
 
-    fn is_enabled(&self, verbosity: Verbosity) -> bool {
-        verbosity.as_num() <= self.enabled_threshold.as_num()
+    fn exclude_by_target(&self, target: &str) -> bool {
+        if let Some(mut include_filters) = self.options.log_include_filter.clone() {
+            include_filters.push(PACKAGE_NAME.to_owned());
+            for filter in include_filters {
+                if !target.starts_with(&filter) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn exclude_by_verbosity(&self, verbosity: Verbosity) -> bool {
+        verbosity.as_num() > self.options.verbosity.unwrap_or_default().as_num()
     }
 }
 
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         let target = metadata.target();
-        if !target.starts_with(&self.package_name) && !target.starts_with("rogue_logging") {
-            return false;
-        }
-        self.is_enabled(Verbosity::from_level(metadata.level()))
+        let verbosity = Verbosity::from_level(metadata.level());
+        !self.exclude_by_target(target) && !self.exclude_by_verbosity(verbosity)
     }
 
     #[allow(clippy::print_stderr)]

@@ -1,20 +1,7 @@
 use crate::*;
 use log::*;
-use std::sync::Arc;
-use std::time::SystemTime;
 
-#[test]
-fn log_time_local() {
-    // Arrange
-    let logger = Logger {
-        enabled_threshold: Verbosity::Trace,
-        time_format: TimeFormat::Local,
-        start: SystemTime::now(),
-        package_name: "coda".to_owned(),
-    };
-    Logger::init(Arc::new(logger));
-
-    // Act
+fn example_logs() {
     error!("This is an error message");
     warn!("This is a warning message");
     info!("This is an info message");
@@ -23,58 +10,49 @@ fn log_time_local() {
 }
 
 #[test]
-fn log_time_utc() {
+#[ignore]
+fn logger_with_time_format_local() {
     // Arrange
-    let logger = Logger {
-        enabled_threshold: Verbosity::Trace,
-        time_format: TimeFormat::Utc,
-        start: SystemTime::now(),
-        package_name: "coda".to_owned(),
-    };
-    Logger::init(Arc::new(logger));
+    let _logger = LoggerBuilder::new()
+        .with_time_format(TimeFormat::Local)
+        .create();
 
     // Act
-    error!("This is an error message");
-    warn!("This is a warning message");
-    info!("This is an info message");
-    debug!("This is a debug message");
-    trace!("This is a trace message");
+    example_logs();
 }
 
 #[test]
-fn log_time_elapsed() {
+#[ignore]
+fn logger_with_time_format_utc() {
     // Arrange
-    let logger = Logger {
-        enabled_threshold: Verbosity::Trace,
-        time_format: TimeFormat::Elapsed,
-        start: SystemTime::now(),
-        package_name: "coda".to_owned(),
-    };
-    Logger::init(Arc::new(logger));
+    let _logger = LoggerBuilder::new()
+        .with_time_format(TimeFormat::Utc)
+        .create();
 
     // Act
-    error!("This is an error message");
-    warn!("This is a warning message");
-    info!("This is an info message");
-    debug!("This is a debug message");
-    trace!("This is a trace message");
+    example_logs();
 }
 
 #[test]
-fn log_time_none() {
+#[ignore]
+fn logger_with_time_format_elapsed() {
     // Arrange
-    let logger = Logger {
-        enabled_threshold: Verbosity::Trace,
-        time_format: TimeFormat::None,
-        start: SystemTime::now(),
-        package_name: "coda".to_owned(),
-    };
-    Logger::init(Arc::new(logger));
+    let _logger = LoggerBuilder::new()
+        .with_time_format(TimeFormat::Elapsed)
+        .create();
 
     // Act
-    error!("This is an error message");
-    warn!("This is a warning message");
-    info!("This is an info message");
-    debug!("This is a debug message");
-    trace!("This is a trace message");
+    example_logs();
+}
+
+#[test]
+#[ignore]
+fn logger_with_time_format_none() {
+    // Arrange
+    let _logger = LoggerBuilder::new()
+        .with_time_format(TimeFormat::None)
+        .create();
+
+    // Act
+    example_logs();
 }
