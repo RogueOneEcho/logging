@@ -16,11 +16,11 @@ include = [
 ]
 
 [dependencies]
-chrono = "0.4.39"
-clap = { version = "4.5.26", features = ["derive"] }
-colored = "3.0.0"
-log = { version = "0.4.22", features = ["std"] }
-serde = { version = "1.0.217", features = ["derive"] }
+chrono = "0.4.43"
+clap = { version = "4.5.56", features = ["derive"] }
+colored = "3.1.1"
+log = { version = "0.4.29", features = ["std"] }
+serde = { version = "1.0.228", features = ["derive"] }
 serde_yaml = "0.9.34"
 
 [lints.clippy]
