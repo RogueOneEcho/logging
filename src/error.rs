@@ -1,3 +1,5 @@
+//! Serializable error type with logging support.
+
 use std::backtrace::{Backtrace, BacktraceStatus};
 use std::fmt::{Debug, Display, Formatter};
 
@@ -5,7 +7,7 @@ use colored::Colorize;
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
 
-/// A serializable and log friendly error
+/// A serializable error with logging support.
 #[derive(Deserialize, Serialize)]
 pub struct Error {
     /// A concise description of the action that failed.
@@ -75,7 +77,7 @@ impl Error {
         lines
     }
 
-    /// Log the error from separate lines.
+    /// Log the error at the error level with backtrace at trace level.
     pub fn log(&self) {
         for line in self.lines() {
             error!("{line}");
@@ -85,7 +87,7 @@ impl Error {
         }
     }
 
-    /// Get the error as a multiline string.
+    /// Multiline string representation of the error.
     pub fn display(&self) -> String {
         self.lines().join("\n")
     }

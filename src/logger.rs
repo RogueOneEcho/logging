@@ -1,3 +1,5 @@
+//! Core logger implementation.
+
 use chrono::{Local, Utc};
 use colored::{ColoredString, Colorize};
 use log::*;
@@ -8,12 +10,15 @@ use crate::*;
 
 const PACKAGE_NAME: &str = "rogue_logging";
 
+/// A logger implementing the [`Log`] trait with colorized, filterable output.
 pub struct Logger {
+    /// Configuration options.
     pub(crate) options: LoggerOptions,
     start: SystemTime,
 }
 
 impl From<LoggerOptions> for Logger {
+    /// Create a logger from configuration options.
     fn from(options: LoggerOptions) -> Self {
         Self {
             options,
@@ -29,6 +34,7 @@ impl Logger {
         format!("{prefix} {message}")
     }
 
+    /// Formatted log prefix containing timestamp, verbosity ID, and icon.
     #[must_use]
     pub fn format_prefix(&self, verbosity: Verbosity) -> String {
         let time = self.format_time();

@@ -1,13 +1,19 @@
+//! Custom color extensions for terminal output.
+
 use colored::{ColoredString, Colorize, CustomColor};
 
 const GRAY: u8 = 168;
 const DARK_GRAY: u8 = 112;
 
+/// Extension trait for applying custom gray colors to strings.
 pub trait Colors {
+    /// Associated error type (unused, exists for trait consistency).
     type Error;
 
+    /// Apply a medium gray color (RGB 168).
     fn gray(&self) -> ColoredString;
 
+    /// Apply a dark gray color (RGB 112).
     fn dark_gray(&self) -> ColoredString;
 }
 

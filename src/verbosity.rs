@@ -1,3 +1,5 @@
+//! Log verbosity levels.
+
 use clap::ValueEnum;
 use colored::{ColoredString, Colorize};
 use log::{Level, LevelFilter};
@@ -6,7 +8,7 @@ use Verbosity::*;
 
 use crate::*;
 
-/// Log level
+/// Log verbosity level controlling which messages are displayed.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize, ValueEnum)]
 #[serde(rename_all = "lowercase")]
 pub enum Verbosity {

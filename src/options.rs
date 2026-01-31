@@ -1,7 +1,9 @@
+//! Configuration options for the logger.
+
 use crate::{TimeFormat, Verbosity};
 use serde::{Deserialize, Serialize};
 
-/// Options for [`Logger`]
+/// Configuration options for [`Logger`].
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct LoggerOptions {
     /// Level of logs to display.
