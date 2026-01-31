@@ -1,0 +1,5 @@
+---
+source: src/tests/logger_tests.rs
+expression: trace
+---
+[38;2;112;112;112m[0m[38;2;112;112;112mTRCE[0m [38;2;112;112;112m↩[0m [2mThis is a trace message[0m

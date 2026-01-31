@@ -1,0 +1,5 @@
+---
+source: src/tests/colors_tests.rs
+expression: result.to_string()
+---
+[38;2;168;168;168mHello, world![0m

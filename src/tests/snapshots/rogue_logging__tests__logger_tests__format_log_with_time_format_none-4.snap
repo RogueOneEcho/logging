@@ -1,0 +1,5 @@
+---
+source: src/tests/logger_tests.rs
+expression: debug
+---
+[38;2;112;112;112m[0m[38;2;112;112;112mDBUG[0m [38;2;112;112;112m*[0m [2mThis is a debug message[0m

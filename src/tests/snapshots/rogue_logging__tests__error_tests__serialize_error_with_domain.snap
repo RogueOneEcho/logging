@@ -1,0 +1,7 @@
+---
+source: src/tests/error_tests.rs
+expression: error
+---
+action: perform action
+message: Something went wrong
+domain: test

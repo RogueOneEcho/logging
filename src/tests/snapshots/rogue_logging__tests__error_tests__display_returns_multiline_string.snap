@@ -1,0 +1,7 @@
+---
+source: src/tests/error_tests.rs
+expression: display
+---
+[1mFailed[0m to load config
+A io error occurred
+File not found

@@ -13,7 +13,7 @@ const PACKAGE_NAME: &str = "rogue_logging";
 /// A logger implementing the [`Log`] trait with colorized, filterable output.
 pub struct Logger {
     /// Configuration options.
-    pub(crate) options: LoggerOptions,
+    pub options: LoggerOptions,
     start: SystemTime,
 }
 
@@ -28,7 +28,9 @@ impl From<LoggerOptions> for Logger {
 }
 
 impl Logger {
-    fn format_log(&self, verbosity: Verbosity, message: String) -> String {
+    /// Format a complete log line with prefix and message.
+    #[must_use]
+    pub(crate) fn format_log(&self, verbosity: Verbosity, message: String) -> String {
         let prefix = self.format_prefix(verbosity);
         let message = format_message(verbosity, message);
         format!("{prefix} {message}")

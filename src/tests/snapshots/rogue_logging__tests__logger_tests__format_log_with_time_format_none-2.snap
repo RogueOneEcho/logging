@@ -1,0 +1,5 @@
+---
+source: src/tests/logger_tests.rs
+expression: warn
+---
+[38;2;112;112;112m[0m[33mWARN[0m [33m△[0m This is a warning message

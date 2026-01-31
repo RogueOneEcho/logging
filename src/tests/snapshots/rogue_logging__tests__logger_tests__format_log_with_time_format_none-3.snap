@@ -1,0 +1,5 @@
+---
+source: src/tests/logger_tests.rs
+expression: info
+---
+[38;2;112;112;112m[0m[34mINFO[0m [34m○[0m This is an info message

@@ -4,7 +4,7 @@ use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 
 /// Timestamp format for log output.
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, ValueEnum)]
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, ValueEnum)]
 #[serde(rename_all = "lowercase")]
 pub enum TimeFormat {
     /// Local date and time in an ISO 8601 like format.
