@@ -54,6 +54,18 @@ fn with_path_adds_path_context() {
 }
 
 #[test]
+fn wrap_with_path_adds_path_context() {
+    let result: Result<(), std::io::Error> = Err(io_error());
+    let failure = result
+        .map_err(Failure::wrap_with_path(
+            TestAction::WriteFile,
+            "/tmp/output.txt",
+        ))
+        .unwrap_err();
+    assert_eq!(failure.get("path"), Some("/tmp/output.txt".to_owned()));
+}
+
+#[test]
 fn get_returns_none_for_missing_key() {
     let failure = Failure::new(TestAction::ReadConfig, io_error());
     assert!(failure.get("nonexistent").is_none());

@@ -92,6 +92,21 @@ impl<T: Action> Failure<T> {
         move |e| configure(Self::new(action, e))
     }
 
+    /// Returns a closure for use with `map_err`, adding path context.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// read_to_string(path).map_err(Failure::wrap_with_path(Action::ReadFile, path))?;
+    /// ```
+    pub fn wrap_with_path<E>(action: T, path: impl AsRef<Path>) -> impl FnOnce(E) -> Self
+    where
+        E: StdError + Send + Sync + 'static,
+    {
+        let path = path.as_ref().display().to_string();
+        move |e| Self::new(action, e).with("path", path)
+    }
+
     /// Get the action.
     #[must_use]
     pub fn action(&self) -> &T {
