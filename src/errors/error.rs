@@ -1,11 +1,14 @@
 //! Serializable error type with logging support.
 
-use std::backtrace::{Backtrace, BacktraceStatus};
-use std::fmt::{Debug, Display, Formatter};
-
+#[cfg(feature = "log")]
 use colored::Colorize;
+#[cfg(feature = "log")]
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
+use std::backtrace::{Backtrace, BacktraceStatus};
+use std::error::Error as StdError;
+use std::fmt::Result as FmtResult;
+use std::fmt::{Debug, Display, Formatter};
 
 /// A serializable error with logging support.
 #[derive(Deserialize, Serialize)]
@@ -66,7 +69,10 @@ impl Error {
     /// Format the error as separate lines.
     fn lines(&self) -> Vec<String> {
         let mut lines = Vec::new();
+        #[cfg(feature = "log")]
         lines.push(format!("{} to {}", "Failed".bold(), self.action));
+        #[cfg(not(feature = "log"))]
+        lines.push(format!("Failed to {}", self.action));
         if let Some(domain) = &self.domain {
             lines.push(format!("A {domain} error occurred"));
         }
@@ -78,6 +84,7 @@ impl Error {
     }
 
     /// Log the error at the error level with backtrace at trace level.
+    #[cfg(feature = "log")]
     pub fn log(&self) {
         for line in self.lines() {
             error!("{line}");
@@ -94,21 +101,18 @@ impl Error {
 }
 
 impl Debug for Error {
-    #[allow(clippy::absolute_paths)]
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> FmtResult {
         write!(formatter, "{}", self.lines().join("\n"))
     }
 }
 
 impl Display for Error {
-    #[allow(clippy::absolute_paths)]
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> FmtResult {
         write!(formatter, "{}", self.lines().join("\n"))
     }
 }
 
-#[allow(clippy::absolute_paths)]
-impl std::error::Error for Error {}
+impl StdError for Error {}
 
 impl Clone for Error {
     fn clone(&self) -> Self {

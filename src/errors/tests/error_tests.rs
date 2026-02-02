@@ -1,5 +1,7 @@
 use crate::Error;
-use insta::{assert_snapshot, assert_yaml_snapshot};
+#[cfg(feature = "log")]
+use insta::assert_snapshot;
+use insta::assert_yaml_snapshot;
 
 #[test]
 fn serialize_error() {
@@ -29,6 +31,7 @@ fn serialize_error_with_domain() {
 }
 
 #[test]
+#[cfg(feature = "log")]
 fn display_returns_multiline_string() {
     // Arrange
     let error = Error {
@@ -43,6 +46,26 @@ fn display_returns_multiline_string() {
 
     // Assert
     assert_snapshot!(display);
+}
+
+#[test]
+#[cfg(not(feature = "log"))]
+fn display_returns_multiline_string() {
+    // Arrange
+    let error = Error {
+        action: "load config".to_owned(),
+        message: "File not found".to_owned(),
+        domain: Some("io".to_owned()),
+        ..Error::default()
+    };
+
+    // Act
+    let display = error.display();
+
+    // Assert
+    assert!(display.contains("Failed to load config"));
+    assert!(display.contains("A io error occurred"));
+    assert!(display.contains("File not found"));
 }
 
 #[test]

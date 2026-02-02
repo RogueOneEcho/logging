@@ -15,11 +15,14 @@ include = [
     "README.md"
 ]
 
+[features]
+log = ["dep:log", "dep:colored"]
+
 [dependencies]
 chrono = "0.4.43"
 clap = { version = "4.5.56", features = ["derive"] }
-colored = "3.1.1"
-log = { version = "0.4.29", features = ["std"] }
+colored = { version = "3.1.1", optional = true }
+log = { version = "0.4.29", features = ["std"], optional = true }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_yaml = "0.9.34"
 

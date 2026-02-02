@@ -1,12 +1,11 @@
 //! Log verbosity levels.
 
+use crate::Colors;
 use clap::ValueEnum;
 use colored::{ColoredString, Colorize};
 use log::{Level, LevelFilter};
 use serde::{Deserialize, Serialize};
 use Verbosity::*;
-
-use crate::*;
 
 /// Log verbosity level controlling which messages are displayed.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize, ValueEnum)]

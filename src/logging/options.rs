@@ -1,6 +1,7 @@
 //! Configuration options for the logger.
 
-use crate::{TimeFormat, Verbosity};
+use crate::TimeFormat;
+use crate::Verbosity;
 use serde::{Deserialize, Serialize};
 
 /// Configuration options for [`Logger`].

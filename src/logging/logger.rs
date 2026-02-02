@@ -1,12 +1,11 @@
 //! Core logger implementation.
 
+use crate::{Colors, LoggerOptions, TimeFormat, Verbosity};
 use chrono::{Local, Utc};
 use colored::{ColoredString, Colorize};
 use log::*;
 use std::borrow::ToOwned;
 use std::time::SystemTime;
-
-use crate::*;
 
 const PACKAGE_NAME: &str = "rogue_logging";
 
@@ -89,7 +88,7 @@ impl Log for Logger {
         !self.exclude_by_target(target) && !self.exclude_by_verbosity(verbosity)
     }
 
-    #[allow(clippy::print_stderr)]
+    #[expect(clippy::print_stderr)]
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
             let verbosity = Verbosity::from_level(record.level());

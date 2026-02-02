@@ -1,7 +1,7 @@
 ---
-source: src/tests/error_tests.rs
+source: src/errors/tests/error_tests.rs
 expression: display
 ---
-[1mFailed[0m to load config
+Failed to load config
 A io error occurred
 File not found
