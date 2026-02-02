@@ -1,3 +1,5 @@
+//! Error types for structured error handling and reporting.
+
 mod error;
 #[cfg(feature = "miette")]
 mod failure;

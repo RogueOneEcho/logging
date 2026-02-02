@@ -14,7 +14,7 @@ pub struct LoggerOptions {
 
     /// Time format to use in logs.
     ///
-    /// Default: `utc`
+    /// Default: `local`
     pub log_time_format: Option<TimeFormat>,
 
     /// Include only logs from specific packages

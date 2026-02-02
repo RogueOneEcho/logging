@@ -60,6 +60,7 @@ impl Verbosity {
         }
     }
 
+    /// Convert from a [`log::Level`].
     #[must_use]
     pub(crate) fn from_level(level: Level) -> Self {
         match level {
@@ -71,6 +72,7 @@ impl Verbosity {
         }
     }
 
+    /// Convert to a [`log::LevelFilter`].
     #[must_use]
     pub(crate) fn to_level_filter(self) -> LevelFilter {
         match self {

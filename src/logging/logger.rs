@@ -11,7 +11,7 @@ const PACKAGE_NAME: &str = "rogue_logging";
 
 /// A logger implementing the [`Log`] trait with colorized, filterable output.
 pub struct Logger {
-    /// Configuration options.
+    /// Configuration options controlling verbosity, time format, and filters.
     pub options: LoggerOptions,
     start: SystemTime,
 }

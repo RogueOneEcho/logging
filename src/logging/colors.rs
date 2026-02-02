@@ -7,9 +7,6 @@ const DARK_GRAY: u8 = 112;
 
 /// Extension trait for applying custom gray colors to strings.
 pub trait Colors {
-    /// Associated error type (unused, exists for trait consistency).
-    type Error;
-
     /// Apply a medium gray color (RGB 168).
     fn gray(&self) -> ColoredString;
 
@@ -18,8 +15,6 @@ pub trait Colors {
 }
 
 impl Colors for &str {
-    type Error = ();
-
     fn gray(&self) -> ColoredString {
         self.custom_color(CustomColor::new(GRAY, GRAY, GRAY))
     }
@@ -30,8 +25,6 @@ impl Colors for &str {
 }
 
 impl Colors for String {
-    type Error = ();
-
     fn gray(&self) -> ColoredString {
         self.custom_color(CustomColor::new(GRAY, GRAY, GRAY))
     }
@@ -42,8 +35,6 @@ impl Colors for String {
 }
 
 impl Colors for ColoredString {
-    type Error = ();
-
     fn gray(&self) -> ColoredString {
         self.clone()
             .custom_color(CustomColor::new(GRAY, GRAY, GRAY))
