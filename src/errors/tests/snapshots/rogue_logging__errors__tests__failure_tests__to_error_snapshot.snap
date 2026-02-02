@@ -1,0 +1,7 @@
+---
+source: src/errors/tests/failure_tests.rs
+expression: error.display()
+---
+Failed to fetch data
+A network error occurred
+file not found

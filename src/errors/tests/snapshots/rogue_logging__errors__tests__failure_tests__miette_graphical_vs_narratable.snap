@@ -1,0 +1,31 @@
+---
+source: src/errors/tests/failure_tests.rs
+expression: "format!(\"{graphical}\\n{}\\n\\n{narratable}\", \"-\".repeat(80))"
+---
+db::connection::failed (https://docs.example.com/troubleshooting/database)
+
+  × Failed to connect to database
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Ensure the database server is running and accessible
+        ▷ path: /var/lib/db/socket
+        ▷ host: localhost
+        ▷ port: 5432
+        ▷ timeout: 30s
+
+--------------------------------------------------------------------------------
+
+Failed to connect to database
+    Diagnostic severity: error
+    Caused by: socket connection refused
+    Caused by: TCP handshake failed
+    Caused by: connection timed out after 30s
+diagnostic help: Ensure the database server is running and accessible
+▷ path: /var/lib/db/socket
+▷ host: localhost
+▷ port: 5432
+▷ timeout: 30s
+diagnostic code: db::connection::failed
+For more details, see:
+https://docs.example.com/troubleshooting/database

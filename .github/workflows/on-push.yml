@@ -59,9 +59,10 @@ jobs:
       id: cache-cargo
       uses: actions/cache/restore@v4
       with:
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}-${{ github.run_number }}
         restore-keys: |
-          ${{ runner.os }}-cargo-
+          cargo-${{ hashFiles('**/Cargo.lock') }}-
+          cargo-
         path: |
           ~/.cargo/bin/
           ~/.cargo/registry/index/
@@ -75,7 +76,7 @@ jobs:
 
     - run: git --no-pager diff --color
 
-    - run: cargo build --release
+    - run: cargo build --release --all-features --tests
 
     - name: Save cargo cache
       id: cargo-cache-save
@@ -89,18 +90,18 @@ jobs:
           ~/.cargo/git/db/
           target/
 
-    - run: cargo test --release --no-fail-fast
+    - run: cargo test --release --no-fail-fast --all-features
 
     - name: Run cargo check
       run: |
-        if ! cargo check --quiet --all-targets --message-format short
+        if ! cargo check --quiet --all-targets --all-features --message-format short
         then
           echo "::warning title=Cargo Check Failed::Please review the output for details."
         fi
 
     - name: Run cargo clippy
       run: |
-        if ! cargo clippy --quiet --all-targets --message-format short
+        if ! cargo clippy --quiet --all-targets --all-features --message-format short
         then
           echo "::warning title=Clippy Check Failed::Please review the output for details."
         fi

@@ -1,0 +1,11 @@
+---
+source: src/errors/tests/failure_tests.rs
+expression: render_diagnostic(&failure)
+---
+rogue_logging::errors::tests::failure_tests::TestAction::ParseConfigFile
+
+  × Failed to parse config file
+  ╰─▶ file not found
+  help: ▷ path: /etc/myapp/config.yaml
+        ▷ line: 42
+        ▷ reason: invalid syntax

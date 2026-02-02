@@ -1,0 +1,48 @@
+---
+source: src/errors/tests/failure_tests.rs
+expression: render_diagnostic(&failure)
+---
+db::connection::failed (https://docs.example.com/db)
+
+  × Failed to connect to database
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Check database connectivity
+        ▷ host: localhost
+        ▷ port: 5432
+
+Error: rogue_logging::errors::tests::failure_tests::TestAction::ReadConfig
+
+  × Failed to read config
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Check file permissions
+        ▷ path: /etc/myapp/config.yaml
+
+Error: rogue_logging::errors::tests::failure_tests::TestAction::Authenticate
+
+  × Failed to authenticate
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Verify credentials are correct
+        ▷ user: admin
+
+Warning: rogue_logging::errors::tests::failure_tests::TestAction::LoadConfig
+
+  ⚠ Failed to load config
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Using default configuration
+
+Error: rogue_logging::errors::tests::failure_tests::TestAction::WriteFile
+
+  × Failed to write file
+  ├─▶ socket connection refused
+  ├─▶ TCP handshake failed
+  ╰─▶ connection timed out after 30s
+  help: Check write permissions
+        ▷ path: /var/log/myapp.log

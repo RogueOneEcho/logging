@@ -1,0 +1,8 @@
+---
+source: src/errors/tests/failure_tests.rs
+expression: render_diagnostic(&failure)
+---
+rogue_logging::errors::tests::failure_tests::TestAction::ReadConfig
+
+  × Failed to read config
+  ╰─▶ file not found

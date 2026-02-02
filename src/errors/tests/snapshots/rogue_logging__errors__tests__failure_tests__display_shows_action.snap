@@ -1,0 +1,5 @@
+---
+source: src/tests/failure_tests.rs
+expression: failure.to_string()
+---
+Failed to read config
