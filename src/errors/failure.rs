@@ -65,7 +65,7 @@ impl<T: Action> Failure<T> {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```text
     /// read_to_string("/etc/config.yaml").map_err(Failure::wrap(Action::ReadFile))?;
     /// ```
     pub fn wrap<E>(action: T) -> impl FnOnce(E) -> Self
@@ -79,7 +79,7 @@ impl<T: Action> Failure<T> {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```text
     /// read_to_string(path).map_err(Failure::wrap_with(Action::ReadFile, |f| {
     ///     f.with_path(path).with_help("Check file permissions")
     /// }))?;
@@ -96,7 +96,7 @@ impl<T: Action> Failure<T> {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```text
     /// read_to_string(path).map_err(Failure::wrap_with_path(Action::ReadFile, path))?;
     /// ```
     pub fn wrap_with_path<E>(action: T, path: impl AsRef<Path>) -> impl FnOnce(E) -> Self
@@ -207,9 +207,32 @@ impl<T: Action> Failure<T> {
     }
 }
 
+impl<T: Action> Failure<T> {
+    fn display_additional(&self) -> String {
+        self.additional
+            .iter()
+            .fold(String::new(), |mut acc, (k, v)| {
+                use std::fmt::Write;
+                let line = format!("▷ {k}: {v}");
+                #[cfg(feature = "miette-fancy")]
+                let line = {
+                    use owo_colors::{OwoColorize, Stream};
+                    line.if_supports_color(Stream::Stdout, |text| text.dimmed())
+                        .to_string()
+                };
+                let _ = write!(acc, "\n{line}");
+                acc
+            })
+    }
+}
+
 impl<T: Action> Display for Failure<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "Failed to {}", self.action)
+        write!(f, "Failed to {}", self.action)?;
+        if !self.additional.is_empty() {
+            write!(f, "{}", self.display_additional())?;
+        }
+        Ok(())
     }
 }
 
@@ -236,24 +259,12 @@ impl<T: Action> Diagnostic for Failure<T> {
         self.severity
     }
 
+    #[expect(
+        clippy::as_conversions,
+        reason = "cast from boxed struct to trait object"
+    )]
     fn help<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {
-        if self.help.is_none() && self.additional.is_empty() {
-            return None;
-        }
-        let mut result = String::new();
-        if let Some(h) = &self.help {
-            result.push_str(h);
-        }
-        for (key, value) in &self.additional {
-            if !result.is_empty() {
-                result.push('\n');
-            }
-            result.push_str("▷ ");
-            result.push_str(key);
-            result.push_str(": ");
-            result.push_str(value);
-        }
-        Some(Box::new(result))
+        self.help.as_ref().map(|h| Box::new(Displayable(h)) as _)
     }
 
     #[expect(

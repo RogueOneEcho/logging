@@ -2,47 +2,27 @@
 source: src/errors/tests/failure_tests.rs
 expression: render_diagnostic(&failure)
 ---
-db::connection::failed (https://docs.example.com/db)
+users::fetch::failed (https://docs.example.com/users)
 
-  × Failed to connect to database
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Check database connectivity
-        ▷ host: localhost
-        ▷ port: 5432
+  × Failed to get all users
+  ├─▶ Failed to cache users
+  │   ▷ path: /var/cache/users.json
+  ├─▶ Failed to parse response
+  │   ▷ url: https://api.example.com/users
+  │   ▷ content_type: application/json
+  ╰─▶ expected ',' at line 3 column 12
+  help: All sources failed
 
-Error: rogue_logging::errors::tests::failure_tests::TestAction::ReadConfig
+Error: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
 
-  × Failed to read config
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Check file permissions
-        ▷ path: /etc/myapp/config.yaml
+  × Failed to cache users
+  │ ▷ url: https://fallback.example.com/users
+  ╰─▶ connection refused
+  help: Fallback API is unavailable
 
-Error: rogue_logging::errors::tests::failure_tests::TestAction::Authenticate
+Warning: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
 
-  × Failed to authenticate
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Verify credentials are correct
-        ▷ user: admin
-
-Warning: rogue_logging::errors::tests::failure_tests::TestAction::LoadConfig
-
-  ⚠ Failed to load config
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Using default configuration
-
-Error: rogue_logging::errors::tests::failure_tests::TestAction::WriteFile
-
-  × Failed to write file
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Check write permissions
-        ▷ path: /var/log/myapp.log
+  ⚠ Failed to cache users
+  │ ▷ path: /var/cache/users.json
+  ╰─▶ file not found
+  help: Local cache is missing

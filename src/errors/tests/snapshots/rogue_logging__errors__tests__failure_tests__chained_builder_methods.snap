@@ -3,3 +3,6 @@ source: src/errors/tests/failure_tests.rs
 expression: failure.to_string()
 ---
 Failed to upload file
+▷ path: /data/file.bin
+▷ size: 1024
+▷ retry: true

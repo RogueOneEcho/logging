@@ -1,31 +1,23 @@
 ---
 source: src/errors/tests/failure_tests.rs
-expression: "format!(\"{graphical}\\n{}\\n\\n{narratable}\", \"-\".repeat(80))"
+expression: snapshot
 ---
-db::connection::failed (https://docs.example.com/troubleshooting/database)
+rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
 
-  × Failed to connect to database
-  ├─▶ socket connection refused
-  ├─▶ TCP handshake failed
-  ╰─▶ connection timed out after 30s
-  help: Ensure the database server is running and accessible
-        ▷ path: /var/lib/db/socket
-        ▷ host: localhost
-        ▷ port: 5432
-        ▷ timeout: 30s
+  × Failed to cache users
+  │ ▷ path: /var/cache/users.json
+  ├─▶ Failed to parse response
+  │   ▷ url: https://api.example.com/users
+  │   ▷ content_type: application/json
+  ╰─▶ expected ',' at line 3 column 12
 
 --------------------------------------------------------------------------------
 
-Failed to connect to database
+Failed to cache users
+▷ path: /var/cache/users.json
     Diagnostic severity: error
-    Caused by: socket connection refused
-    Caused by: TCP handshake failed
-    Caused by: connection timed out after 30s
-diagnostic help: Ensure the database server is running and accessible
-▷ path: /var/lib/db/socket
-▷ host: localhost
-▷ port: 5432
-▷ timeout: 30s
-diagnostic code: db::connection::failed
-For more details, see:
-https://docs.example.com/troubleshooting/database
+    Caused by: Failed to parse response
+▷ url: https://api.example.com/users
+▷ content_type: application/json
+    Caused by: expected ',' at line 3 column 12
+diagnostic code: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers

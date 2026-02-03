@@ -3,3 +3,5 @@ source: src/errors/tests/failure_tests.rs
 expression: failure.to_string()
 ---
 Failed to read config
+▷ path: /etc/config.yaml
+▷ attempt: 3

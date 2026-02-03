@@ -2,8 +2,8 @@
 source: src/errors/tests/failure_tests.rs
 expression: render_diagnostic(&failure)
 ---
-rogue_logging::errors::tests::failure_tests::TestAction::ConnectToDatabase
+rogue_logging::errors::tests::test_helpers::TestAction::Connect
 
-  × Failed to connect to database
+  × Failed to connect
   ╰─▶ file not found
-  help: Check that the database server is running
+  help: Check that the server is running

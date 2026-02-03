@@ -1,3 +1,4 @@
+use crate::errors::tests::test_helpers::use_colors;
 use crate::Error;
 #[cfg(feature = "log")]
 use insta::assert_snapshot;
@@ -34,6 +35,7 @@ fn serialize_error_with_domain() {
 #[cfg(feature = "log")]
 fn display_returns_multiline_string() {
     // Arrange
+    use_colors(false);
     let error = Error {
         action: "load config".to_owned(),
         message: "File not found".to_owned(),
@@ -87,6 +89,7 @@ fn clone_loses_backtrace() {
 #[test]
 fn debug_matches_display() {
     // Arrange
+    use_colors(false);
     let error = Error {
         action: "test action".to_owned(),
         message: "test message".to_owned(),

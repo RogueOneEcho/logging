@@ -1,46 +1,21 @@
+use crate::errors::tests::test_helpers::*;
 use crate::{Failure, Severity};
 use insta::assert_snapshot;
 use miette::{Diagnostic, GraphicalReportHandler, GraphicalTheme, NarratableReportHandler};
 use std::error::Error as StdError;
-use std::io;
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-enum TestAction {
-    #[error("read config")]
-    ReadConfig,
-    #[error("write file")]
-    WriteFile,
-    #[error("load config")]
-    LoadConfig,
-    #[error("parse json")]
-    ParseJson,
-    #[error("connect")]
-    Connect,
-    #[error("authenticate")]
-    Authenticate,
-    #[error("upload file")]
-    UploadFile,
-    #[error("fetch data")]
-    FetchData,
-    #[error("parse config file")]
-    ParseConfigFile,
-    #[error("connect to database")]
-    ConnectToDatabase,
-}
-
-fn io_error() -> io::Error {
-    io::Error::new(io::ErrorKind::NotFound, "file not found")
-}
+use std::io::Error as IoError;
+use std::io::ErrorKind as IoErrorKind;
 
 #[test]
 fn display_shows_action() {
+    use_colors(false);
     let failure = Failure::new(TestAction::ReadConfig, io_error());
     assert_snapshot!(failure.to_string());
 }
 
 #[test]
 fn display_with_additional_context() {
+    use_colors(false);
     let failure = Failure::new(TestAction::ReadConfig, io_error())
         .with("path", "/etc/config.yaml")
         .with("attempt", "3");
@@ -55,13 +30,13 @@ fn with_path_adds_path_context() {
 
 #[test]
 fn wrap_with_path_adds_path_context() {
-    let result: Result<(), std::io::Error> = Err(io_error());
+    let result: Result<(), _> = Err(io_error());
     let failure = result
         .map_err(Failure::wrap_with_path(
             TestAction::WriteFile,
             "/tmp/output.txt",
         ))
-        .unwrap_err();
+        .expect_err("should be Err");
     assert_eq!(failure.get("path"), Some("/tmp/output.txt".to_owned()));
 }
 
@@ -173,6 +148,7 @@ fn debug_impl_works() {
 
 #[test]
 fn chained_builder_methods() {
+    use_colors(false);
     let failure = Failure::new(TestAction::UploadFile, io_error())
         .with_path("/data/file.bin")
         .with("size", "1024")
@@ -182,6 +158,7 @@ fn chained_builder_methods() {
 
 #[test]
 fn to_error_snapshot() {
+    use_colors(false);
     let failure = Failure::new(TestAction::FetchData, io_error())
         .with("domain", "network")
         .with("endpoint", "/api/v1/data");
@@ -207,8 +184,8 @@ fn miette_render_basic() {
 
 #[test]
 fn miette_render_with_help() {
-    let failure = Failure::new(TestAction::ConnectToDatabase, io_error())
-        .with_help("Check that the database server is running");
+    let failure =
+        Failure::new(TestAction::Connect, io_error()).with_help("Check that the server is running");
     assert_snapshot!(render_diagnostic(&failure));
 }
 
@@ -221,10 +198,13 @@ fn miette_render_with_url() {
 
 #[test]
 fn miette_render_with_context() {
-    let failure = Failure::new(TestAction::ParseConfigFile, io_error())
+    use_colors(false);
+    let inner = Failure::new(TestAction::ParseConfigFile, io_error())
         .with_path("/etc/myapp/config.yaml")
-        .with("line", "42")
-        .with("reason", "invalid syntax");
+        .with("line", "42");
+    let failure = Failure::new(TestAction::LoadConfig, inner)
+        .with("format", "yaml")
+        .with("env", "production");
     assert_snapshot!(render_diagnostic(&failure));
 }
 
@@ -236,68 +216,69 @@ fn miette_render_with_warning_severity() {
     assert_snapshot!(render_diagnostic(&failure));
 }
 
-#[derive(Debug, Error)]
-#[error("connection timed out after 30s")]
-struct TimeoutError;
-
-#[derive(Debug, Error)]
-#[error("TCP handshake failed")]
-struct TcpError(#[from] TimeoutError);
-
-#[derive(Debug, Error)]
-#[error("socket connection refused")]
-struct SocketError(#[from] TcpError);
-
-fn socket_error() -> SocketError {
-    SocketError::from(TcpError::from(TimeoutError))
+#[test]
+fn miette_render_with_related() {
+    use_colors(false);
+    let fallback_api = {
+        let conn_err = IoError::new(IoErrorKind::ConnectionRefused, "connection refused");
+        Failure::new(HttpAction::CacheUsers, conn_err)
+            .with("url", "https://fallback.example.com/users")
+            .with_help("Fallback API is unavailable")
+    };
+    let local_cache = {
+        let not_found = IoError::new(IoErrorKind::NotFound, "file not found");
+        Failure::new(HttpAction::CacheUsers, not_found)
+            .with_path("/var/cache/users.json")
+            .with_severity(Severity::Warning)
+            .with_help("Local cache is missing")
+    };
+    let failure = Failure::new(TestAction::GetAllUsers, http_error())
+        .with_code("users::fetch::failed")
+        .with_help("All sources failed")
+        .with_url("https://docs.example.com/users")
+        .with_related(fallback_api)
+        .with_related(local_cache);
+    assert_snapshot!(render_diagnostic(&failure));
 }
 
 #[test]
 fn miette_graphical_vs_narratable() {
-    let failure = Failure::new(TestAction::ConnectToDatabase, socket_error())
-        .with_code("db::connection::failed")
-        .with_severity(Severity::Error)
-        .with_help("Ensure the database server is running and accessible")
-        .with_url("https://docs.example.com/troubleshooting/database")
-        .with_path("/var/lib/db/socket")
-        .with("host", "localhost")
-        .with("port", "5432")
-        .with("timeout", "30s");
+    use_colors(false);
+
+    // Arrange
+    let failure = http_error();
+
+    // Act
     let graphical = render_diagnostic(&failure);
     let mut narratable = String::new();
     NarratableReportHandler::new()
         .render_report(&mut narratable, &failure)
         .expect("should render");
-    assert_snapshot!(format!("{graphical}\n{}\n\n{narratable}", "-".repeat(80)));
+
+    // Assert
+    let snapshot = format!("{graphical}\n{}\n\n{narratable}", "-".repeat(80));
+    assert_snapshot!(snapshot);
 }
 
 #[test]
-fn miette_render_with_related() {
-    let failure = Failure::new(TestAction::ConnectToDatabase, socket_error())
-        .with_code("db::connection::failed")
-        .with_help("Check database connectivity")
-        .with_url("https://docs.example.com/db")
-        .with("host", "localhost")
-        .with("port", "5432")
-        .with_related(
-            Failure::new(TestAction::ReadConfig, socket_error())
-                .with_path("/etc/myapp/config.yaml")
-                .with_help("Check file permissions"),
-        )
-        .with_related(
-            Failure::new(TestAction::Authenticate, socket_error())
-                .with("user", "admin")
-                .with_help("Verify credentials are correct"),
-        )
-        .with_related(
-            Failure::new(TestAction::LoadConfig, socket_error())
-                .with_severity(Severity::Warning)
-                .with_help("Using default configuration"),
-        )
-        .with_related(
-            Failure::new(TestAction::WriteFile, socket_error())
-                .with_path("/var/log/myapp.log")
-                .with_help("Check write permissions"),
-        );
-    assert_snapshot!(render_diagnostic(&failure));
+#[ignore = "modifies global color state, run manually with --ignored"]
+#[cfg(feature = "miette-fancy")]
+fn miette_graphical_with_colors() {
+    // Arrange
+    use_colors(true);
+    let failure = http_error();
+
+    // Act
+    let mut graphical = String::new();
+    GraphicalReportHandler::new_themed(GraphicalTheme::unicode())
+        .with_links(false)
+        .render_report(&mut graphical, &failure)
+        .expect("should render diagnostic");
+    use_colors(false);
+
+    // Assert
+    println!("\n{graphical}\n");
+    let dimmed_context = "\x1b[0m\x1b[2m▷ url: https://api.example.com/users\x1b[0m";
+    let count = graphical.matches(dimmed_context).count();
+    assert_eq!(count, 1);
 }
