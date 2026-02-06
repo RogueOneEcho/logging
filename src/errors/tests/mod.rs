@@ -1,3 +1,5 @@
+#[cfg(feature = "miette-fancy")]
+mod diagnostic_ext_tests;
 mod error_tests;
 #[cfg(feature = "miette")]
 mod failure_tests;

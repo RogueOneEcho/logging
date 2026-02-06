@@ -18,7 +18,7 @@ include = [
 [features]
 log = ["dep:log", "dep:colored"]
 miette = ["dep:miette"]
-miette-fancy = ["miette", "dep:owo-colors"]
+miette-fancy = ["miette", "miette/fancy", "dep:owo-colors"]
 
 [dependencies]
 chrono = { version = "0.4.43" }
