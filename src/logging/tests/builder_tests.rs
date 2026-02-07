@@ -3,7 +3,7 @@ use crate::{LoggerBuilder, LoggerOptions, TimeFormat, Verbosity};
 #[test]
 fn new_creates_builder_with_defaults() {
     // Arrange & Act
-    let logger = LoggerBuilder::new().without_init().create();
+    let logger = LoggerBuilder::new().create();
 
     // Assert
     assert_eq!(logger.options.verbosity, None);
@@ -23,10 +23,7 @@ fn with_options_sets_all_options() {
     };
 
     // Act
-    let logger = LoggerBuilder::new()
-        .with_options(options)
-        .without_init()
-        .create();
+    let logger = LoggerBuilder::new().with_options(options).create();
 
     // Assert
     assert_eq!(logger.options.verbosity, Some(Verbosity::Debug));
@@ -46,7 +43,6 @@ fn with_verbosity_sets_verbosity() {
     // Arrange & Act
     let logger = LoggerBuilder::new()
         .with_verbosity(Verbosity::Trace)
-        .without_init()
         .create();
 
     // Assert
@@ -58,7 +54,6 @@ fn with_time_format_sets_time_format() {
     // Arrange & Act
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::Elapsed)
-        .without_init()
         .create();
 
     // Assert
@@ -70,7 +65,6 @@ fn with_include_filter_adds_filter() {
     // Arrange & Act
     let logger = LoggerBuilder::new()
         .with_include_filter("my_crate".to_owned())
-        .without_init()
         .create();
 
     // Assert
@@ -86,7 +80,6 @@ fn with_include_filter_accumulates() {
     let logger = LoggerBuilder::new()
         .with_include_filter("crate_a".to_owned())
         .with_include_filter("crate_b".to_owned())
-        .without_init()
         .create();
 
     // Assert
@@ -101,7 +94,6 @@ fn with_exclude_filter_adds_filter() {
     // Arrange & Act
     let logger = LoggerBuilder::new()
         .with_exclude_filter("noisy_crate".to_owned())
-        .without_init()
         .create();
 
     // Assert
@@ -109,14 +101,4 @@ fn with_exclude_filter_adds_filter() {
         logger.options.log_exclude_filters,
         Some(vec!["noisy_crate".to_owned()])
     );
-}
-
-#[test]
-fn without_init_skips_initialization() {
-    // Arrange & Act
-    let logger = LoggerBuilder::new().without_init().create();
-
-    // Assert - logger is created but not set as global logger
-    // We verify this by checking the logger exists and has expected defaults
-    assert_eq!(logger.options.verbosity, None);
 }

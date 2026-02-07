@@ -9,7 +9,6 @@ fn format_log_with_time_format_local() {
     force_truecolor();
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::Local)
-        .without_init()
         .create();
 
     // Act
@@ -27,7 +26,6 @@ fn format_log_with_time_format_utc() {
     force_truecolor();
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::Utc)
-        .without_init()
         .create();
 
     // Act
@@ -45,7 +43,6 @@ fn format_log_with_time_format_elapsed() {
     force_truecolor();
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::Elapsed)
-        .without_init()
         .create();
 
     // Act
@@ -63,7 +60,6 @@ fn format_log_with_time_format_none() {
     force_truecolor();
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::None)
-        .without_init()
         .create();
 
     // Act
@@ -91,7 +87,6 @@ fn enabled_excludes_target_with_exclude_filter() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_exclude_filter("noisy_crate".to_owned())
-        .without_init()
         .create();
     let metadata = Metadata::builder()
         .level(Level::Info)
@@ -99,7 +94,7 @@ fn enabled_excludes_target_with_exclude_filter() {
         .build();
 
     // Act
-    let enabled = log::Log::enabled(logger.as_ref(), &metadata);
+    let enabled = log::Log::enabled(&logger, &metadata);
 
     // Assert
     assert!(!enabled);
@@ -110,7 +105,6 @@ fn enabled_includes_target_without_matching_filter() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_exclude_filter("noisy_crate".to_owned())
-        .without_init()
         .create();
     let metadata = Metadata::builder()
         .level(Level::Info)
@@ -118,7 +112,7 @@ fn enabled_includes_target_without_matching_filter() {
         .build();
 
     // Act
-    let enabled = log::Log::enabled(logger.as_ref(), &metadata);
+    let enabled = log::Log::enabled(&logger, &metadata);
 
     // Assert
     assert!(enabled);
@@ -129,7 +123,6 @@ fn enabled_excludes_target_not_in_include_filter() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_include_filter("allowed_crate".to_owned())
-        .without_init()
         .create();
     let metadata = Metadata::builder()
         .level(Level::Info)
@@ -137,7 +130,7 @@ fn enabled_excludes_target_not_in_include_filter() {
         .build();
 
     // Act
-    let enabled = log::Log::enabled(logger.as_ref(), &metadata);
+    let enabled = log::Log::enabled(&logger, &metadata);
 
     // Assert
     assert!(!enabled);
@@ -148,7 +141,6 @@ fn enabled_excludes_verbosity_above_threshold() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_verbosity(Verbosity::Info)
-        .without_init()
         .create();
     let metadata = Metadata::builder()
         .level(Level::Debug)
@@ -156,7 +148,7 @@ fn enabled_excludes_verbosity_above_threshold() {
         .build();
 
     // Act
-    let enabled = log::Log::enabled(logger.as_ref(), &metadata);
+    let enabled = log::Log::enabled(&logger, &metadata);
 
     // Assert
     assert!(!enabled);
@@ -167,7 +159,6 @@ fn enabled_includes_verbosity_at_threshold() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_verbosity(Verbosity::Info)
-        .without_init()
         .create();
     let metadata = Metadata::builder()
         .level(Level::Info)
@@ -175,7 +166,7 @@ fn enabled_includes_verbosity_at_threshold() {
         .build();
 
     // Act
-    let enabled = log::Log::enabled(logger.as_ref(), &metadata);
+    let enabled = log::Log::enabled(&logger, &metadata);
 
     // Assert
     assert!(enabled);
@@ -186,7 +177,6 @@ fn format_prefix_contains_verbosity_id() {
     // Arrange
     let logger = LoggerBuilder::new()
         .with_time_format(TimeFormat::None)
-        .without_init()
         .create();
 
     // Act
