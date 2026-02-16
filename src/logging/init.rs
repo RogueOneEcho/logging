@@ -1,7 +1,6 @@
 //! Global logger initialization.
 
 use crate::{Logger, Verbosity};
-use colored::control::SHOULD_COLORIZE;
 use colored::Colorize;
 use log::{set_boxed_logger, set_max_level, trace, Log};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -40,7 +39,6 @@ fn init(logger: impl Log + 'static, verbosity: Option<Verbosity>) -> bool {
     if IS_INITIALIZED.swap(true, Ordering::Relaxed) {
         return false;
     }
-    SHOULD_COLORIZE.set_override(true);
     match set_boxed_logger(Box::new(logger)) {
         Ok(()) => set_max_level(verbosity.unwrap_or_default().to_level_filter()),
         Err(error) => {
