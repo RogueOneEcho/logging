@@ -244,6 +244,12 @@ impl<T: Action> StdError for Failure<T> {
     }
 }
 
+impl<T: Action> AsRef<T> for Failure<T> {
+    fn as_ref(&self) -> &T {
+        &self.action
+    }
+}
+
 impl<T: Action> Diagnostic for Failure<T> {
     fn code<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {
         Some(Box::new(
