@@ -13,14 +13,14 @@ users::fetch::failed (https://docs.example.com/users)
   ╰─▶ expected ',' at line 3 column 12
   help: All sources failed
 
-Error: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
+Error: rogue_logging::HttpAction::CacheUsers
 
   × Failed to cache users
   │ ▷ url: https://fallback.example.com/users
   ╰─▶ connection refused
   help: Fallback API is unavailable
 
-Warning: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
+Warning: rogue_logging::HttpAction::CacheUsers
 
   ⚠ Failed to cache users
   │ ▷ path: /var/cache/users.json

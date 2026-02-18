@@ -7,14 +7,10 @@ use std::error::Error as StdError;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::path::Path;
 
-type BoxedError = Box<dyn StdError + Send + Sync>;
-
 /// Marker trait for action types that can be used with [`Failure`].
 pub trait Action: Debug + Display {}
 
 impl<T: Debug + Display> Action for T {}
-
-type BoxedDiagnostic = Box<dyn Diagnostic + Send + Sync>;
 
 /// A wrapper that implements [`miette::Diagnostic`] for rich error reporting.
 ///
@@ -250,9 +246,11 @@ impl<T: Action> StdError for Failure<T> {
 
 impl<T: Action> Diagnostic for Failure<T> {
     fn code<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {
-        Some(Box::new(self.code.clone().unwrap_or_else(|| {
-            format!("{}::{:?}", type_name::<T>(), self.action)
-        })))
+        Some(Box::new(
+            self.code
+                .clone()
+                .unwrap_or_else(|| short_code::<T>(&self.action)),
+        ))
     }
 
     fn severity(&self) -> Option<Severity> {
@@ -293,5 +291,191 @@ struct Displayable<'a, T: Display>(&'a T);
 impl<T: Display> Display for Displayable<'_, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         Display::fmt(self.0, f)
+    }
+}
+
+/// Build a short diagnostic code from `type_name::<T>()` and the action's `Debug` output.
+///
+/// - Enum actions: `crate::EnumName::Variant`
+/// - Struct actions at crate root (`crate::Struct`): `crate::Struct`
+/// - Struct actions with a parent module (`crate::module::Struct`): `crate::module::Struct`
+fn short_code<T: Action>(action: &T) -> String {
+    let full = type_name::<T>();
+    let segments: Vec<&str> = full.split("::").collect();
+    let crate_name = segments.first().unwrap_or(&full);
+    let type_name_segment = segments.last().unwrap_or(&full);
+    let debug = format!("{action:?}");
+    let first_word = debug.split([' ', '(', '{']).next().unwrap_or(&debug);
+    let is_struct = first_word == *type_name_segment;
+    if is_struct {
+        if segments.len() > 2 {
+            #[expect(clippy::indexing_slicing, reason = "len > 2 is checked")]
+            let parent = segments[segments.len() - 2];
+            format!("{crate_name}::{parent}::{type_name_segment}")
+        } else {
+            format!("{crate_name}::{type_name_segment}")
+        }
+    } else {
+        format!("{crate_name}::{type_name_segment}::{first_word}")
+    }
+}
+
+type BoxedError = Box<dyn StdError + Send + Sync>;
+
+type BoxedDiagnostic = Box<dyn Diagnostic + Send + Sync>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use insta::assert_snapshot;
+    use std::fmt::Write;
+    use std::io;
+
+    #[derive(Debug)]
+    enum SimpleEnum {
+        Read,
+        Write,
+    }
+    impl Display for SimpleEnum {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            match self {
+                Self::Read => write!(f, "read"),
+                Self::Write => write!(f, "write"),
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    enum TupleEnum {
+        Download(String),
+    }
+    impl Display for TupleEnum {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            match self {
+                Self::Download(url) => write!(f, "download {url}"),
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    enum StructEnum {
+        Connect { host: String },
+    }
+    impl Display for StructEnum {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            match self {
+                Self::Connect { host } => write!(f, "connect to {host}"),
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    enum SingleVariant {
+        Only,
+    }
+    impl Display for SingleVariant {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            write!(f, "only")
+        }
+    }
+
+    #[derive(Debug)]
+    struct UnitStruct;
+    impl Display for UnitStruct {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            write!(f, "unit action")
+        }
+    }
+
+    #[derive(Debug)]
+    struct FieldStruct {
+        _msg: String,
+    }
+    impl Display for FieldStruct {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            write!(f, "field action")
+        }
+    }
+
+    #[derive(Debug)]
+    struct TupleStruct(#[expect(dead_code)] String);
+    impl Display for TupleStruct {
+        fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+            write!(f, "tuple action")
+        }
+    }
+
+    #[expect(clippy::unwrap_used)]
+    #[test]
+    fn short_code_snapshot() {
+        let mut out = String::new();
+        let mut line = |label: &str, code: &str| writeln!(out, "{label:<40} => {code}").unwrap();
+        // Enum — unit variants
+        line(
+            "SimpleEnum::Read",
+            &short_code::<SimpleEnum>(&SimpleEnum::Read),
+        );
+        line(
+            "SimpleEnum::Write",
+            &short_code::<SimpleEnum>(&SimpleEnum::Write),
+        );
+        // Enum — tuple variant (payload must not leak)
+        line(
+            "TupleEnum::Download(url)",
+            &short_code::<TupleEnum>(&TupleEnum::Download("https://example.com".into())),
+        );
+        // Enum — struct variant (fields must not leak)
+        line(
+            "StructEnum::Connect { host }",
+            &short_code::<StructEnum>(&StructEnum::Connect {
+                host: "localhost".into(),
+            }),
+        );
+        // Enum — single variant
+        line(
+            "SingleVariant::Only",
+            &short_code::<SingleVariant>(&SingleVariant::Only),
+        );
+        // Struct — unit
+        line("UnitStruct", &short_code::<UnitStruct>(&UnitStruct));
+        // Struct — with fields (values must not leak)
+        line(
+            "FieldStruct { _msg }",
+            &short_code::<FieldStruct>(&FieldStruct {
+                _msg: "secret".into(),
+            }),
+        );
+        // Struct — tuple (values must not leak)
+        line(
+            "TupleStruct(data)",
+            &short_code::<TupleStruct>(&TupleStruct("secret".into())),
+        );
+        // String action (edge case — alloc::string::String)
+        line(
+            "String(\"do something\")",
+            &short_code::<String>(&String::from("do something")),
+        );
+        // Custom code override
+        line(
+            "with_code override",
+            &Failure::new(SimpleEnum::Read, io::Error::other("e"))
+                .with_code("my::custom::code")
+                .code()
+                .unwrap()
+                .to_string(),
+        );
+        // from_action (no source)
+        line(
+            "from_action enum",
+            &Failure::from_action(SimpleEnum::Write)
+                .code()
+                .unwrap()
+                .to_string(),
+        );
+        line(
+            "from_action struct",
+            &Failure::from_action(UnitStruct).code().unwrap().to_string(),
+        );
+        assert_snapshot!(out);
     }
 }

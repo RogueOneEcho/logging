@@ -2,7 +2,7 @@
 source: src/errors/tests/failure_tests.rs
 expression: snapshot
 ---
-rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
+rogue_logging::HttpAction::CacheUsers
 
   × Failed to cache users
   │ ▷ path: /var/cache/users.json
@@ -20,4 +20,4 @@ Failed to cache users
 ▷ url: https://api.example.com/users
 ▷ content_type: application/json
     Caused by: expected ',' at line 3 column 12
-diagnostic code: rogue_logging::errors::tests::test_helpers::HttpAction::CacheUsers
+diagnostic code: rogue_logging::HttpAction::CacheUsers

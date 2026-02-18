@@ -2,7 +2,7 @@
 source: src/errors/tests/failure_tests.rs
 expression: render_diagnostic(&failure)
 ---
-rogue_logging::errors::tests::test_helpers::TestAction::LoadConfig
+rogue_logging::TestAction::LoadConfig
 
   × Failed to load config
   │ ▷ format: yaml

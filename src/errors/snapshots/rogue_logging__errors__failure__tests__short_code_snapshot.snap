@@ -1,0 +1,16 @@
+---
+source: src/errors/failure.rs
+expression: out
+---
+SimpleEnum::Read                         => rogue_logging::SimpleEnum::Read
+SimpleEnum::Write                        => rogue_logging::SimpleEnum::Write
+TupleEnum::Download(url)                 => rogue_logging::TupleEnum::Download
+StructEnum::Connect { host }             => rogue_logging::StructEnum::Connect
+SingleVariant::Only                      => rogue_logging::SingleVariant::Only
+UnitStruct                               => rogue_logging::tests::UnitStruct
+FieldStruct { _msg }                     => rogue_logging::tests::FieldStruct
+TupleStruct(data)                        => rogue_logging::tests::TupleStruct
+String("do something")                   => alloc::String::"do
+with_code override                       => my::custom::code
+from_action enum                         => rogue_logging::SimpleEnum::Write
+from_action struct                       => rogue_logging::tests::UnitStruct
