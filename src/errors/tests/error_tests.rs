@@ -110,8 +110,8 @@ fn default_has_empty_strings() {
     let error = Error::default();
 
     // Assert
-    assert!(error.action.is_empty());
-    assert!(error.message.is_empty());
+    assert_eq!(error.action, "");
+    assert_eq!(error.message, "");
     assert!(error.domain.is_none());
     assert!(error.status_code.is_none());
 }

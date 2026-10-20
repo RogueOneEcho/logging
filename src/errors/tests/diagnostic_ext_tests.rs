@@ -7,7 +7,7 @@ fn render_produces_output() {
     use_colors(false);
     let failure = Failure::new(TestAction::ReadConfig, io_error());
     let rendered = failure.render();
-    assert!(!rendered.is_empty());
+    assert_ne!(rendered, "");
     assert!(rendered.contains("read config"));
 }
 
